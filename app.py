@@ -8,7 +8,7 @@ import os
 app = Flask(__name__)
 
 # Dropbox access token and file details
-dropbox_token = 'sl.B50ksRK4raqdipYF__auaUVQD92kZJfP9sFPObe9oB4zBkFNJCTHmcsifkEMcmDoFLarBI6rq0tQgsHBGYRhgGPzCvG2Zwvb-jm0As3E7GXxbuF00ExfT6Htm6ffOEOkWfX12XAmupdOuzk'
+dropbox_token = 'sl.B51jDpwWfR3r33O-YJ7WjeG2xbipIzzYB0IAGT4zEzDFnXbt43fv8_4uYbzMSqbdzBNhVq9b79-e01nPVL2nV6A4BFbQBT7I5NsRk5pXb6G8_PezPEFzVDg1wx1b0YpCTxzIs93vL-n_hw8'
 dropbox_file_path = '/husk_model.pth'
 model_path = 'husk_model.pth'
 
