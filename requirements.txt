@@ -5,3 +5,4 @@ torchvision==0.15.2
 pillow==9.5.0
 Flask-Cors==4.0.1
 gunicorn==20.1.0
+numpy
