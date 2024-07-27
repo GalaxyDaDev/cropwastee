@@ -12,9 +12,7 @@ WORKDIR /app
 # Copy the requirements file into the container
 COPY requirements.txt .
 
-# Add diagnostic commands to help debug installation issues
-RUN pip --version
-RUN python --version
+# Upgrade pip and install dependencies
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 

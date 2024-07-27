@@ -5,4 +5,4 @@ torchvision==0.15.1
 Pillow==9.5.0
 requests==2.31.0
 numpy==1.25.0
-werkzeug==2.3.4
+werkzeug==2.3.7
