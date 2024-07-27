@@ -2,27 +2,28 @@ from flask import Flask, request, jsonify
 from PIL import Image
 import torch
 from torchvision import transforms, models
-import dropbox
+import requests
 import os
 
 app = Flask(__name__)
 
-# Dropbox access token and file details
-dropbox_token = 'sl.B51jDpwWfR3r33O-YJ7WjeG2xbipIzzYB0IAGT4zEzDFnXbt43fv8_4uYbzMSqbdzBNhVq9b79-e01nPVL2nV6A4BFbQBT7I5NsRk5pXb6G8_PezPEFzVDg1wx1b0YpCTxzIs93vL-n_hw8'
-dropbox_file_path = '/husk_model.pth'
+# GitHub repository details
+github_release_url = 'https://github.com/GalaxyDaDev/cropwastee/releases/download/ai/husk_model.pth'
 model_path = 'husk_model.pth'
 
-def download_model_from_dropbox():
+def download_model_from_github():
     if not os.path.isfile(model_path):
-        print('Downloading model from Dropbox...')
-        dbx = dropbox.Dropbox(dropbox_token)
-        metadata, response = dbx.files_download(dropbox_file_path)
-        with open(model_path, 'wb') as file:
-            file.write(response.content)
-        print('Model downloaded successfully.')
+        print('Downloading model from GitHub...')
+        response = requests.get(github_release_url)
+        if response.status_code == 200:
+            with open(model_path, 'wb') as file:
+                file.write(response.content)
+            print('Model downloaded successfully.')
+        else:
+            print('Failed to download model:', response.status_code, response.text)
 
 # Load the model
-download_model_from_dropbox()
+download_model_from_github()
 model = models.resnet18(weights='DEFAULT')
 num_classes = 8
 in_features = model.fc.in_features

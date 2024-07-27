@@ -1,7 +1,5 @@
-Flask==2.3.2
-torch==2.0.1
+Flask==2.3.3
+Pillow==10.0.0
+torch==2.1.0
 torchvision==0.15.2
-Pillow==9.5.0
-requests==2.29.0
-dropbox==12.0.0
-gunicorn==20.1.0
+requests==2.30.0
