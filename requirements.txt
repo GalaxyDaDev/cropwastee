@@ -2,6 +2,6 @@ Flask==2.3.2
 torch==2.0.1
 torchvision==0.15.2
 Pillow==9.5.0
-requests==2.31.0
-dropbox==12.0.0         
+requests==2.29.0
+dropbox==12.0.0
 gunicorn==20.1.0
