@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from PIL import Image
 import torch
 from torchvision import transforms, models
@@ -6,6 +7,7 @@ import requests
 import os
 
 app = Flask(__name__)
+CORS(app)
 
 # GitHub repository details
 github_release_url = 'https://github.com/GalaxyDaDev/cropwastee/releases/download/ai/husk_model.pth'
