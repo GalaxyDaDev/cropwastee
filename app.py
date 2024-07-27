@@ -1,29 +1,44 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import torch
-import torchvision.transforms as transforms
+from torchvision import models, transforms
 from PIL import Image
-from torchvision.models import resnet18
+import io
+import requests
 
 app = Flask(__name__)
+CORS(app)
 
-# Define the model architecture
-class HuskModel(torch.nn.Module):
-    def __init__(self):
-        super(HuskModel, self).__init__()
-        self.model = resnet18(pretrained=False)  # Example model
-        self.model.fc = torch.nn.Linear(self.model.fc.in_features, 8)  # Adjust the final layer for 8 classes
+# URL of the model file
+model_url = 'https://github.com/GalaxyDaDev/cropwastee/releases/download/ai/husk_model.pth'
+model_path = 'husk_model.pth'
 
-    def forward(self, x):
-        return self.model(x)
+# Function to download the model file
+def download_model(url, path):
+    response = requests.get(url)
+    response.raise_for_status()  # Ensure we notice bad responses
+    with open(path, 'wb') as f:
+        f.write(response.content)
 
-# Initialize and load the model
-model = HuskModel()
-model.load_state_dict(torch.hub.load_state_dict_from_url(
-    'https://github.com/GalaxyDaDev/cropwastee/releases/download/ai/husk_model.pth', 
-    map_location='cpu'))
-model.eval()
+# Initialize model
+def initialize_model():
+    model = models.resnet18(weights='DEFAULT')
+    num_classes = 8
+    model.fc = torch.nn.Linear(model.fc.in_features, num_classes)
+    try:
+        model.load_state_dict(torch.load(model_path))
+    except FileNotFoundError:
+        download_model(model_url, model_path)
+        model.load_state_dict(torch.load(model_path))
+    model.eval()
+    return model
 
-# Define transformations for the input image
+model = initialize_model()
+
+# Define the class names
+class_names = ['Chickpea Husk', 'Corn Husk', 'Field Pea Husk', 'Grass Pea Husk', 'Lentil Husk', 'Rice Husk', 'Wheat Husk', 'Soybean Husk']
+
+# Define image transformations
 preprocess = transforms.Compose([
     transforms.Resize(256),
     transforms.CenterCrop(224),
@@ -34,30 +49,25 @@ preprocess = transforms.Compose([
 @app.route('/predict', methods=['POST'])
 def predict():
     if 'file' not in request.files:
-        return jsonify({'error': 'No file part'}), 400
+        return jsonify({'error': 'No file provided'}), 400
 
     file = request.files['file']
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
 
     try:
-        img = Image.open(file.stream).convert('RGB')
-        img_tensor = preprocess(img).unsqueeze(0)  # Add batch dimension
-
-        with torch.no_grad():
-            outputs = model(img_tensor)
-            _, predicted = torch.max(outputs, 1)
-            class_idx = predicted.item()
-
-        # Replace with your class labels
-        class_labels = ['Chickpea Husk', 'Corn Husk', 'Field Pea Husk', 
-                         'Grass Pea Husk', 'Lentil Husk', 'Rice Husk', 'Wheat Husk']
-        result = class_labels[class_idx]
-
-        return jsonify({'class': result})
-
+        image = Image.open(io.BytesIO(file.read())).convert('RGB')
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': str(e)}), 400
+
+    image = preprocess(image).unsqueeze(0)
+
+    with torch.no_grad():
+        outputs = model(image)
+        _, predicted = torch.max(outputs, 1)
+        predicted_class = class_names[predicted.item()]
+
+    return jsonify({'class': predicted_class})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=False)
