@@ -19,8 +19,5 @@ RUN pip install gunicorn
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
 
-# Define environment variable
-ENV FLASK_APP=app.py
-
 # Run Gunicorn when the container launches
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
